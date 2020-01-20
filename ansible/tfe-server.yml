@@ -1,0 +1,113 @@
+---
+- name: install tfe server
+  hosts: all
+  serial: 1
+  become: true
+
+  vars:
+    NODE_NAME: "tfe-Server"
+    PRIVATE_ADDR: "127.0.0.1"
+    PUBLIC_ADDR: "127.0.0.1"
+    HOSTNAME: "server.company.com"
+    ADMIN_PASSWORD: "admin"
+    ENC_PASSWORD: "admin"
+
+  tasks:
+
+  - name: install epel-release
+    yum:
+      name: epel-release
+      state: present
+
+  - name: install common packages
+    yum:
+      name:
+        - unzip
+        - vim
+        - jq
+      state: present
+
+  - name: disable selinux
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: enable docker repo
+    yum_repository:
+      name: docker-ce
+      description: Docker CE Repository
+      baseurl: "https://download.docker.com/linux/centos/7/$basearch/stable"
+      enabled: yes
+      gpgcheck: yes
+      gpgkey: https://download.docker.com/linux/centos/gpg
+
+  - name: preinstall containerd
+    yum:
+      name: containerd.io-1.2.6
+      update_cache: true
+      state: present
+
+  - name: install docker
+    yum:
+      name: "docker-ce-18.09.2"
+      update_cache: true
+      state: present
+    register: yum_docker_install
+    until: yum_docker_install is success
+    retries: 3
+    delay: 60
+
+  - name: enable docker
+    systemd:
+      name: docker
+      state: started
+      enabled: true
+
+  - name: ensure docker group exists
+    group:
+      name: docker
+      state: present
+
+  - name: create install directory
+    file: 
+      path: /opt/tfe-installer/
+      state: directory
+
+  - name: configure replicated
+    template:
+      src: ./files/replicated.conf.j2
+      dest: /etc/replicated.conf
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: configure tfe
+    template:
+      src: ./files/settings.conf.j2
+      dest: /opt/tfe-installer/settings.conf
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: set license file
+    copy:
+      src: ./files/license.rli
+      dest: /opt/tfe-installer/license.rli
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: download install file
+    unarchive:
+      src: "https://install.terraform.io/airgap/latest.tar.gz"
+      dest: /opt/tfe-installer/
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: start replicated installer
+    shell: 
+      cmd: "./install.sh no-proxy private-address={{ PRIVATE_ADDR }} public-address={{ PUBLIC_ADDR }}"
+      chdir: /opt/tfe-installer/
+      creates: /etc/systemd/system/replicated.service

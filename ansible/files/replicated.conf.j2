@@ -1,0 +1,9 @@
+{
+    "DaemonAuthenticationType":     "password",
+    "DaemonAuthenticationPassword": "{{ ADMIN_PASSWORD }}",
+    "TlsBootstrapType":             "self-signed",
+    "TlsBootstrapHostname":         "{{ HOSTNAME }}",
+    "BypassPreflightChecks":        true,
+    "ImportSettingsFrom":           "/opt/tfe-installer/settings.conf",
+    "LicenseFileLocation":          "/opt/tfe-installer/license.rli"
+}
