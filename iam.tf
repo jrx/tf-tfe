@@ -1,50 +1,31 @@
-resource "aws_iam_role" "ec2_consul_discover_role" {
-  name               = "consul-role"
-  assume_role_policy = <<EOF
+# S3
+
+resource "aws_iam_user" "tfe_objects" {
+  name          = "${var.cluster_name}tfe-object-store"
+  force_destroy = true
+}
+
+resource "aws_iam_access_key" "tfe_objects" {
+  user = aws_iam_user.tfe_objects.name
+}
+
+resource "aws_iam_user_policy" "tfe_objects" {
+  user = aws_iam_user.tfe_objects.name
+  name = "${var.cluster_name}archivist-bucket"
+
+  policy = <<__policy
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Resource": [
+            "arn:aws:s3:::${aws_s3_bucket.tfe_objects.id}",
+            "arn:aws:s3:::${aws_s3_bucket.tfe_objects.id}/*"
+        ],
+        "Effect": "Allow",
+        "Action": [
+            "s3:*"
+        ]
+    }]
 }
-EOF
-}
-
-resource "aws_iam_policy" "consul-policy" {
-  name        = "consul-policy"
-  description = "policy to discover the consul cluster nodes"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:DescribeInstances"
-      ],
-      "Resource": [
-        "*"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy_attachment" "consul-attach" {
-  name       = "consul-attach"
-  roles      = ["${aws_iam_role.ec2_consul_discover_role.name}"]
-  policy_arn = aws_iam_policy.consul-policy.arn
-}
-
-resource "aws_iam_instance_profile" "consul_profile" {
-  name = "consul_profile"
-  role = aws_iam_role.ec2_consul_discover_role.name
+__policy
 }

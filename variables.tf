@@ -62,3 +62,13 @@ variable "tfe_enc_password" {
   description = "Password to be used for data encryption."
   default     = "admin"
 }
+
+variable "tfe_database_name" {
+  description = "name of the initial database"
+  default     = "tfe"
+}
+
+variable "tfe_database_username" {
+  description = "username of the initial user"
+  default     = "tfe"
+}

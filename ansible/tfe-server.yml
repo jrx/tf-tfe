@@ -11,6 +11,14 @@
     HOSTNAME: "server.company.com"
     ADMIN_PASSWORD: "admin"
     ENC_PASSWORD: "admin"
+    AWS_ACCESS_KEY_ID: "secret"
+    AWS_SECRET_ACCESS_KEY: "secret"
+    DATABASE_NAME: "mydatabase"
+    DATABASE_ENDPOINT: "db.company.com"
+    DATABASE_PASSWORD: "admin"
+    DATABASE_USERNAME: "admin"
+    S3_BUCKET: "mybucket"
+    S3_REGION: "eu-central-1"
 
   tasks:
 

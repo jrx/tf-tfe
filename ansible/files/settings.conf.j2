@@ -1,9 +1,13 @@
 {
-    "aws_access_key_id": {},
+    "aws_access_key_id": {
+        "value": "{{ AWS_ACCESS_KEY_ID }}"
+    },
     "aws_instance_profile": {
         "value": "0"
     },
-    "aws_secret_access_key": {},
+    "aws_secret_access_key": {
+        "value": "{{ AWS_SECRET_ACCESS_KEY }}"
+    },
     "azure_account_key": {},
     "azure_account_name": {},
     "azure_container": {},
@@ -48,20 +52,36 @@
         "value": "60"
     },
     "installation_type": {
-        "value": "poc"
+        "value": "production"
     },
-    "pg_dbname": {},
-    "pg_extra_params": {},
-    "pg_netloc": {},
-    "pg_password": {},
-    "pg_user": {},
+    "pg_dbname": {
+        "value": "{{ DATABASE_NAME }}"
+    },
+    "pg_extra_params": {
+        "value": "sslmode=disable"
+    },
+    "pg_netloc": {
+        "value": "{{ DATABASE_ENDPOINT }}"
+    },
+    "pg_password": {
+        "value": "{{ DATABASE_PASSWORD }}"
+    },
+    "pg_user": {
+        "value": "{{ DATABASE_USERNAME }}"
+    },
     "placement": {
         "value": "placement_s3"
     },
-    "production_type": {},
-    "s3_bucket": {},
+    "production_type": {
+        "value": "external"
+    },
+    "s3_bucket": {
+        "value": "{{ S3_BUCKET }}"
+    },
     "s3_endpoint": {},
-    "s3_region": {},
+    "s3_region": {
+        "value": "{{ S3_REGION }}"
+    },
     "s3_sse": {},
     "s3_sse_kms_key_id": {},
     "tbw_image": {
