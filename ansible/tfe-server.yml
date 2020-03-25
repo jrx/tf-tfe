@@ -9,6 +9,7 @@
     PRIVATE_ADDR: "127.0.0.1"
     PUBLIC_ADDR: "127.0.0.1"
     HOSTNAME: "server.company.com"
+    RELEASE_SEQUENCE: 0
     ADMIN_PASSWORD: "admin"
     ENC_PASSWORD: "admin"
     AWS_ACCESS_KEY_ID: "secret"

@@ -49,6 +49,12 @@ variable "tfe_instance_type" {
   default     = "m5.xlarge"
 }
 
+variable "tfe_release_sequence" {
+  type        = number
+  description = "Numerical identifier to pin a TFE release, e.g. 419."
+  default     = 0
+}
+
 variable "domain" {
   description = "Root domain in route53"
   default     = "server.company.com"
