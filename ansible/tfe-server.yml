@@ -82,6 +82,11 @@
       path: /opt/tfe-installer/
       state: directory
 
+  - name: check if replicated is installed
+    stat: 
+      path: /etc/systemd/system/replicated.service
+    register: replicated_service
+
   - name: configure replicated
     template:
       src: ./files/replicated.conf.j2
@@ -89,6 +94,8 @@
       mode: 0755
       owner: root
       group: root
+    notify:
+      - restart replicated
 
   - name: configure tfe
     template:
@@ -97,6 +104,8 @@
       mode: 0755
       owner: root
       group: root
+    notify:
+      - restart replicated
 
   - name: set license file
     copy:
@@ -105,6 +114,8 @@
       mode: 0755
       owner: root
       group: root
+    notify:
+      - restart replicated
 
   - name: download install file
     unarchive:
@@ -114,9 +125,20 @@
       mode: 0755
       owner: root
       group: root
+    when: replicated_service.stat.exists == false
 
   - name: start replicated installer
     shell: 
       cmd: "./install.sh no-proxy private-address={{ PRIVATE_ADDR }} public-address={{ PUBLIC_ADDR }}"
       chdir: /opt/tfe-installer/
-      creates: /etc/systemd/system/replicated.service
+    when: replicated_service.stat.exists == false
+
+  handlers:
+
+  - name: restart replicated
+    systemd:
+      name: replicated.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    when: replicated_service.stat.exists == true
