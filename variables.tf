@@ -30,6 +30,7 @@ variable "amis" {
   type = map(string)
   default = {
     eu-central-1 = "ami-04cf43aca3e6f3de3" # centos 7
+    #eu-north-1 = "ami-0affd4508a5d2481b" # centos 7
     #eu-central-1 = "ami-0b418580298265d5c" # ubuntu 18.04
   }
 }
@@ -48,9 +49,27 @@ variable "tfe_instance_type" {
   default     = "m5.xlarge"
 }
 
-variable "tfe_hostname" {
-  description = "TFE public dns name to access the frontend."
+variable "domain" {
+  description = "Root domain in route53"
   default     = "server.company.com"
+}
+
+variable "cert_domain" {
+  type        = string
+  description = "Domain to search for ACM certificate with (default is *.domain)"
+  default     = ""
+}
+
+variable "update_route53" {
+  type        = string
+  description = "Indicate if route53 should be updated automatically."
+  default     = true
+}
+
+variable "private_zone" {
+  type        = string
+  description = "Set to true if your route53 zone is private."
+  default     = false
 }
 
 variable "tfe_admin_password" {
@@ -71,4 +90,8 @@ variable "tfe_database_name" {
 variable "tfe_database_username" {
   description = "username of the initial user"
   default     = "tfe"
+}
+
+locals {
+  tfe_hostname = "${var.cluster_name}.${var.domain}"
 }

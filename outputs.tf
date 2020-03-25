@@ -2,6 +2,10 @@ output "tfe_public_ip" {
   value = aws_instance.tfe.*.public_ip
 }
 
+output "tfe_hostname" {
+  value = "${local.tfe_hostname}"
+}
+
 output "database_password" {
   value = "${random_string.database_password.result}"
 }
