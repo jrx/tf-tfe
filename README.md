@@ -1,7 +1,7 @@
-# TFE Instance on AWS
+# TFE on AWS
 
-## Ansible Development
+A set of Terraform and Ansible scripts that setup Terraform Enterprise.
 
-```sh
-ansible-playbook -i "<ip1>," ansible/tfe-server.yml
-```
+## License
+
+[Mozilla Public License v2.0](./LICENSE)
