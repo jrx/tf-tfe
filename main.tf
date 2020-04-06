@@ -7,16 +7,52 @@ terraform {
   backend "remote" {}
 }
 
+module "net" {
+  source       = "./modules/net"
+  cluster_name = var.cluster_name
+  owner        = var.owner
+  aws_azs      = var.aws_azs
+}
+
+module "rds" {
+  source                 = "./modules/rds"
+  cluster_name           = var.cluster_name
+  tfe_database_name      = var.tfe_database_name
+  tfe_database_username  = var.tfe_database_username
+  subnet_ids             = module.net.public_subnets
+  vpc_security_group_ids = module.net.vpc_security_group_db
+}
+
+module "s3" {
+  source       = "./modules/s3"
+  cluster_name = var.cluster_name
+  aws_region   = var.aws_region
+}
+
+locals {
+  tfe_hostname = "${var.cluster_name}.${var.domain}"
+}
+
+module "route53" {
+  source         = "./modules/route53"
+  domain         = var.domain
+  cert_domain    = var.cert_domain
+  update_route53 = var.update_route53
+  private_zone   = var.private_zone
+  ips            = aws_instance.tfe.*.public_ip
+  hostname       = local.tfe_hostname
+}
+
 resource "aws_instance" "tfe" {
   ami                         = var.amis[var.aws_region]
   instance_type               = var.tfe_instance_type
   key_name                    = var.key_name
-  vpc_security_group_ids      = ["${aws_security_group.default.id}"]
+  vpc_security_group_ids      = module.net.vpc_security_group_default
   associate_public_ip_address = true
   count                       = var.num_tfe
 
-  availability_zone = module.vpc.azs[count.index % length(module.vpc.azs)]
-  subnet_id         = module.vpc.public_subnets[count.index % length(module.vpc.azs)]
+  availability_zone = module.net.azs[count.index % length(module.net.azs)]
+  subnet_id         = module.net.public_subnets[count.index % length(module.net.azs)]
 
   root_block_device {
     volume_size = 50
@@ -44,7 +80,7 @@ resource "null_resource" "ansible" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum -y install ansible",
-      "cd ansible; ansible-playbook -c local -i \"localhost,\" -e 'HOSTNAME=${local.tfe_hostname} RELEASE_SEQUENCE=${var.tfe_release_sequence} ADMIN_PASSWORD=${var.tfe_admin_password} ENC_PASSWORD=${var.tfe_enc_password} PRIVATE_ADDR=${element(aws_instance.tfe.*.private_ip, count.index)} PUBLIC_ADDR=${element(aws_instance.tfe.*.public_ip, count.index)} NODE_NAME=tfe-s${count.index} AWS_ACCESS_KEY_ID=${aws_iam_access_key.tfe_objects.id} AWS_SECRET_ACCESS_KEY=${aws_iam_access_key.tfe_objects.secret} DATABASE_NAME=${aws_rds_cluster.tfe.database_name} DATABASE_ENDPOINT=${aws_rds_cluster.tfe.endpoint} DATABASE_PASSWORD=${random_string.database_password.result} DATABASE_USERNAME=${var.tfe_database_username} S3_BUCKET=${aws_s3_bucket.tfe_objects.id} S3_REGION=${aws_s3_bucket.tfe_objects.region}' tfe-server.yml",
+      "cd ansible; ansible-playbook -c local -i \"localhost,\" -e 'HOSTNAME=${local.tfe_hostname} RELEASE_SEQUENCE=${var.tfe_release_sequence} ADMIN_PASSWORD=${var.tfe_admin_password} ENC_PASSWORD=${var.tfe_enc_password} PRIVATE_ADDR=${element(aws_instance.tfe.*.private_ip, count.index)} PUBLIC_ADDR=${element(aws_instance.tfe.*.public_ip, count.index)} NODE_NAME=tfe-s${count.index} AWS_ACCESS_KEY_ID=${aws_iam_access_key.tfe_objects.id} AWS_SECRET_ACCESS_KEY=${aws_iam_access_key.tfe_objects.secret} DATABASE_NAME=${module.rds.database_name} DATABASE_ENDPOINT=${module.rds.endpoint} DATABASE_PASSWORD=${module.rds.database_password} DATABASE_USERNAME=${var.tfe_database_username} S3_BUCKET=${module.s3.bucket_id} S3_REGION=${module.s3.region}' tfe-server.yml",
     ]
   }
 

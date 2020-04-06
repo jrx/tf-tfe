@@ -14,9 +14,9 @@ resource "aws_route53_record" "tfe_lb" {
   count = var.update_route53 ? 1 : 0
 
   zone_id = data.aws_route53_zone.zone[count.index].zone_id
-  name    = local.tfe_hostname
+  name    = var.hostname
   type    = "A"
   ttl     = "10"
-  records = aws_instance.tfe.*.public_ip
+  records = var.ips
 
 }

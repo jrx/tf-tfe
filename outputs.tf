@@ -3,31 +3,31 @@ output "tfe_public_ip" {
 }
 
 output "tfe_hostname" {
-  value = "${local.tfe_hostname}"
+  value = local.tfe_hostname
 }
 
 output "database_password" {
-  value = "${random_string.database_password.result}"
+  value = module.rds.database_password
 }
 
 output "database_username" {
-  value = "${var.tfe_database_username}"
+  value = var.tfe_database_username
 }
 
 output "database_endpoint" {
-  value = "${aws_rds_cluster.tfe.endpoint}"
+  value = module.rds.endpoint
 }
 
 output "database_name" {
-  value = "${var.tfe_database_name}"
+  value = module.rds.database_name
 }
 
 output "s3_bucket" {
-  value = "${aws_s3_bucket.tfe_objects.id}"
+  value = module.s3.bucket_id
 }
 
 output "s3_region" {
-  value = "${aws_s3_bucket.tfe_objects.region}"
+  value = module.s3.region
 }
 
 output "aws_access_key_id" {

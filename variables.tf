@@ -1,22 +1,27 @@
 variable "cluster_name" {
+  type        = string
   description = "Name of the tfe cluster."
   default     = "tfe-example"
 }
 
 variable "owner" {
+  type        = string
   description = "Owner tag on all resources."
   default     = "myuser"
 }
 
 variable "key_name" {
+  type        = string
   description = "Specify the AWS ssh key to use."
 }
 
 variable "private_key" {
+  type        = string
   description = "SSH private key to provision the cluster instances."
 }
 
 variable "aws_region" {
+  type    = string
   default = "eu-central-1"
 }
 
@@ -36,15 +41,18 @@ variable "amis" {
 }
 
 variable "instance_username" {
+  type    = string
   default = "centos"
 }
 
 variable "num_tfe" {
+  type        = number
   description = "Specify the amount of TFE servers. For redundancy you should have at least 2."
   default     = 1
 }
 
 variable "tfe_instance_type" {
+  type        = string
   description = "TFE server instance type."
   default     = "m5.xlarge"
 }
@@ -56,6 +64,7 @@ variable "tfe_release_sequence" {
 }
 
 variable "domain" {
+  type        = string
   description = "Root domain in route53"
   default     = "server.company.com"
 }
@@ -79,25 +88,25 @@ variable "private_zone" {
 }
 
 variable "tfe_admin_password" {
+  type        = string
   description = "Password to be used for Replicated admin console."
   default     = "admin"
 }
 
 variable "tfe_enc_password" {
+  type        = string
   description = "Password to be used for data encryption."
   default     = "admin"
 }
 
 variable "tfe_database_name" {
+  type        = string
   description = "name of the initial database"
   default     = "tfe"
 }
 
 variable "tfe_database_username" {
+  type        = string
   description = "username of the initial user"
   default     = "tfe"
-}
-
-locals {
-  tfe_hostname = "${var.cluster_name}.${var.domain}"
 }

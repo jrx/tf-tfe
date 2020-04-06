@@ -5,7 +5,7 @@ resource "random_string" "database_password" {
 
 resource "aws_db_subnet_group" "tfe" {
   name_prefix = "${var.cluster_name}-tfe"
-  subnet_ids  = module.vpc.public_subnets
+  subnet_ids  = var.subnet_ids
 
   tags = {
     Name = "tfe subnet group"
@@ -21,7 +21,7 @@ resource "aws_rds_cluster" "tfe" {
   db_subnet_group_name      = aws_db_subnet_group.tfe.name
   backup_retention_period   = 5
   preferred_backup_window   = "07:00-09:00"
-  vpc_security_group_ids    = [aws_security_group.db_access.id]
+  vpc_security_group_ids    = var.vpc_security_group_ids
   final_snapshot_identifier = "${var.cluster_name}-tfe-final"
   skip_final_snapshot       = true
 }
