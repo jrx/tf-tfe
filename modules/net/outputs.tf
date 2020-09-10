@@ -1,9 +1,9 @@
 output "public_subnets" {
-  value = module.vpc.public_subnets
+  value = data.terraform_remote_state.vpc.outputs.aws_public_subnets
 }
 
 output "azs" {
-  value = module.vpc.azs
+  value = data.terraform_remote_state.vpc.outputs.aws_azs
 }
 
 output "vpc_security_group_default" {
