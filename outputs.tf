@@ -29,11 +29,3 @@ output "s3_bucket" {
 output "s3_region" {
   value = module.s3.region
 }
-
-output "aws_access_key_id" {
-  value = aws_iam_access_key.tfe_objects.id
-}
-
-output "aws_secret_access_key" {
-  value = aws_iam_access_key.tfe_objects.secret
-}

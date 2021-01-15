@@ -1,14 +1,30 @@
-resource "aws_iam_user" "tfe_objects" {
-  name          = "${var.cluster_name}tfe-object-store"
-  force_destroy = true
+resource "aws_iam_role" "tfe_objects_role" {
+  name = "tfe_objects_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
-resource "aws_iam_access_key" "tfe_objects" {
-  user = aws_iam_user.tfe_objects.name
+resource "aws_iam_instance_profile" "tfe_objects_profile" {
+  name = "tfe_objects_profile"
+  role = aws_iam_role.tfe_objects_role.name
 }
 
-resource "aws_iam_user_policy" "tfe_objects" {
-  user = aws_iam_user.tfe_objects.name
+resource "aws_iam_role_policy" "tfe_objects_policy" {
+  role = aws_iam_role.tfe_objects_role.name
   name = "${var.cluster_name}archivist-bucket"
 
   policy = <<__policy

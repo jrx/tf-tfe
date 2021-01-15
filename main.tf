@@ -2,11 +2,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-terraform {
-  required_version = ">= 0.12"
-  backend "remote" {}
-}
-
 module "net" {
   source       = "./modules/net"
   cluster_name = var.cluster_name
@@ -47,6 +42,7 @@ resource "aws_instance" "tfe" {
   instance_type               = var.tfe_instance_type
   key_name                    = var.key_name
   vpc_security_group_ids      = module.net.vpc_security_group_default
+  iam_instance_profile        = aws_iam_instance_profile.tfe_objects_profile.name
   associate_public_ip_address = true
   count                       = var.num_tfe
 
@@ -80,7 +76,7 @@ resource "null_resource" "ansible" {
   }
   provisioner "remote-exec" {
     inline = [
-      "cd ansible; ansible-playbook -c local -i \"localhost,\" -e 'HOSTNAME=${local.tfe_hostname} RELEASE_SEQUENCE=${var.tfe_release_sequence} ADMIN_PASSWORD=${var.tfe_admin_password} ENC_PASSWORD=${var.tfe_enc_password} PRIVATE_ADDR=${element(aws_instance.tfe.*.private_ip, count.index)} PUBLIC_ADDR=${element(aws_instance.tfe.*.public_ip, count.index)} NODE_NAME=tfe-s${count.index} AWS_ACCESS_KEY_ID=${aws_iam_access_key.tfe_objects.id} AWS_SECRET_ACCESS_KEY=${aws_iam_access_key.tfe_objects.secret} DATABASE_NAME=${module.rds.database_name} DATABASE_ENDPOINT=${module.rds.endpoint} DATABASE_PASSWORD=${module.rds.database_password} DATABASE_USERNAME=${var.tfe_database_username} S3_BUCKET=${module.s3.bucket_id} S3_REGION=${module.s3.region}' tfe-server.yml",
+      "cd ansible; ansible-playbook -c local -i \"localhost,\" -e 'HOSTNAME=${local.tfe_hostname} RELEASE_SEQUENCE=${var.tfe_release_sequence} ADMIN_PASSWORD=${var.tfe_admin_password} ENC_PASSWORD=${var.tfe_enc_password} PRIVATE_ADDR=${element(aws_instance.tfe.*.private_ip, count.index)} PUBLIC_ADDR=${element(aws_instance.tfe.*.public_ip, count.index)} NODE_NAME=tfe-s${count.index} DATABASE_NAME=${module.rds.database_name} DATABASE_ENDPOINT=${module.rds.endpoint} DATABASE_PASSWORD=${module.rds.database_password} DATABASE_USERNAME=${var.tfe_database_username} S3_BUCKET=${module.s3.bucket_id} S3_REGION=${module.s3.region}' tfe-server.yml",
     ]
   }
 
@@ -92,6 +88,6 @@ resource "null_resource" "ansible" {
   }
 
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 }

@@ -22,20 +22,20 @@ variable "private_key" {
 
 variable "aws_region" {
   type    = string
-  default = "eu-central-1"
+  default = "eu-north-1"
 }
 
 variable "aws_azs" {
-  type        = list
+  type        = list(any)
   description = "List of the availability zones to use."
-  default     = ["eu-central-1a", "eu-central-1b", "eu-central-1c"]
+  default     = ["eu-north-1a", "eu-north-1b", "eu-north-1c"]
 }
 
 variable "amis" {
   type = map(string)
   default = {
-    eu-central-1 = "ami-04cf43aca3e6f3de3" # centos 7
-    #eu-north-1 = "ami-0affd4508a5d2481b" # centos 7
+    #eu-central-1 = "ami-04cf43aca3e6f3de3" # centos 7
+    eu-north-1 = "ami-026f0eb2e8006617d" # centos 7
     #eu-central-1 = "ami-0b418580298265d5c" # ubuntu 18.04
   }
 }

@@ -9,6 +9,6 @@ variable "owner" {
 }
 
 variable "aws_azs" {
-  type        = list
+  type        = list(any)
   description = "List of the availability zones to use."
 }

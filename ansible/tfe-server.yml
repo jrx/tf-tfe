@@ -12,8 +12,6 @@
     RELEASE_SEQUENCE: 0
     ADMIN_PASSWORD: "admin"
     ENC_PASSWORD: "admin"
-    AWS_ACCESS_KEY_ID: "secret"
-    AWS_SECRET_ACCESS_KEY: "secret"
     DATABASE_NAME: "mydatabase"
     DATABASE_ENDPOINT: "db.company.com"
     DATABASE_PASSWORD: "admin"

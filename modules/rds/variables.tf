@@ -13,10 +13,10 @@ variable "tfe_database_username" {
   description = "username of the initial user"
 }
 
-variable subnet_ids {
-  type = list
+variable "subnet_ids" {
+  type = list(any)
 }
 
-variable vpc_security_group_ids {
-  type = list
+variable "vpc_security_group_ids" {
+  type = list(any)
 }
