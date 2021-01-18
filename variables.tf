@@ -47,8 +47,8 @@ variable "instance_username" {
 
 variable "num_tfe" {
   type        = number
-  description = "Specify the amount of TFE servers. For redundancy you should have at least 2."
-  default     = 1
+  description = "Specify the amount of TFE servers. For redundancy you should have 2."
+  default     = 2
 }
 
 variable "tfe_instance_type" {

@@ -49,9 +49,28 @@ resource "aws_security_group" "db_access" {
   vpc_id = data.terraform_remote_state.vpc.outputs.aws_vpc_id
 
   ingress {
-    protocol  = "tcp"
-    from_port = "5432"
-    to_port   = "5432"
+    description = "TFE ingress to rds"
+    protocol    = "tcp"
+    from_port   = "5432"
+    to_port     = "5432"
+
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  tags = {
+    Name  = "sg-${var.cluster_name}"
+    Owner = var.owner
+  }
+}
+
+resource "aws_security_group" "redis_access" {
+  vpc_id = data.terraform_remote_state.vpc.outputs.aws_vpc_id
+
+  ingress {
+    description = "TFE ingress to redis"
+    protocol    = "tcp"
+    from_port   = 7480
+    to_port     = 7480
 
     cidr_blocks = ["10.0.0.0/16"]
   }

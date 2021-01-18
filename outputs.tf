@@ -22,6 +22,18 @@ output "database_name" {
   value = module.rds.database_name
 }
 
+output "redis_host" {
+  value = module.redis.redis_host
+}
+
+output "redis_port" {
+  value = module.redis.redis_port
+}
+
+output "redis_pass" {
+  value = module.redis.redis_pass
+}
+
 output "s3_bucket" {
   value = module.s3.bucket_id
 }

@@ -19,6 +19,9 @@
         "value": "hashicorp/build-worker:now"
     },
     "disk_path": {},
+    "enable_active_active": {
+        "value": "1"
+    },
     "enable_metrics_collection": {
         "value": "1"
     },
@@ -71,6 +74,21 @@
     "production_type": {
         "value": "external"
     },
+    "redis_host" : {
+        "value": "{{ REDIS_HOST }}"
+    },
+    "redis_port" : {
+        "value": "{{ REDIS_PORT }}"
+    },
+    "redis_use_password_auth" : {
+        "value": "1"
+    },
+    "redis_pass" : {
+        "value": "{{ REDIS_PASS }}"
+    },
+    "redis_use_tls" : {
+        "value": "1"
+    },
     "s3_bucket": {
         "value": "{{ S3_BUCKET }}"
     },
@@ -85,5 +103,29 @@
     },
     "tls_vers": {
         "value": "tls_1_2_tls_1_3"
-    }
+    },
+   "install_id":{
+      "value":"{{ HOSTNAME }}"
+   },   
+   "root_secret":{
+      "value":"c459ff2cd1346ef4c6da4b950ac59423"
+   },
+   "user_token":{
+      "value":"6c403112981d0ae2ce6b4b2c7a1b1997"
+   },
+   "archivist_token":{
+      "value":"8019fe7227d1de1029ad7c1bf6f9e676"
+   },
+   "cookie_hash":{
+      "value":"c8b3227dbb93d73a0cbaa294172aba80"
+   },
+   "internal_api_token":{
+      "value":"da25f5700fc28639334040c3418939db"
+   },
+   "registry_session_encryption_key":{
+      "value":"4d579751597b3bdf6dd7b3eaab3067f5"
+   },
+   "registry_session_secret_key":{
+      "value":"6c1c4d73cc0a6cccbbb61284b0c32b35"
+   }
 }
