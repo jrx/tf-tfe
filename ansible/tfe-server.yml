@@ -53,13 +53,13 @@
 
   - name: preinstall containerd
     yum:
-      name: containerd.io-1.2.6
+      name: containerd.io-1.4.3
       update_cache: true
       state: present
 
   - name: install docker
     yum:
-      name: "docker-ce-18.09.2"
+      name: "docker-ce-19.03.8"
       update_cache: true
       state: present
     register: yum_docker_install
