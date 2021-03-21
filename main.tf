@@ -60,6 +60,8 @@ resource "aws_instance" "tfe" {
     volume_size = 50
   }
 
+  user_data = data.template_file.user_data[count.index].rendered
+
   tags = {
     Name  = "${var.cluster_name}-tfe-${count.index}"
     Owner = var.owner
@@ -67,34 +69,28 @@ resource "aws_instance" "tfe" {
   }
 }
 
-resource "null_resource" "ansible" {
+data "template_file" "user_data" {
   count = var.num_tfe
 
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /home/${var.instance_username}/ansible",
-      "sudo yum -y install epel-release",
-      "sudo yum -y install ansible",
-    ]
-  }
-  provisioner "file" {
-    source      = "./ansible/"
-    destination = "/home/${var.instance_username}/ansible/"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "cd ansible; ansible-playbook -c local -i \"localhost,\" -e 'HOSTNAME=${local.tfe_hostname} RELEASE_SEQUENCE=${var.tfe_release_sequence} ADMIN_PASSWORD=${var.tfe_admin_password} ENC_PASSWORD=${var.tfe_enc_password} PRIVATE_ADDR=${element(aws_instance.tfe.*.private_ip, count.index)} PUBLIC_ADDR=${element(aws_instance.tfe.*.public_ip, count.index)} NODE_NAME=tfe-s${count.index} DATABASE_NAME=${module.rds.database_name} DATABASE_ENDPOINT=${module.rds.endpoint} DATABASE_PASSWORD=${module.rds.database_password} DATABASE_USERNAME=${var.tfe_database_username} REDIS_HOST=${module.redis.redis_host} REDIS_PORT=${module.redis.redis_port} REDIS_PASS=${module.redis.redis_pass} S3_BUCKET=${module.s3.bucket_id} S3_REGION=${module.s3.region}' tfe-server.yml",
-    ]
-  }
+  template = format("%s\n%s\n%s",
+    file("${path.module}/templates/replicated.sh.tpl"),
+    file("${path.module}/templates/settings.sh.tpl"),
+    file("${path.module}/templates/tfe.sh.tpl")
+  )
 
-  connection {
-    host        = coalesce(element(aws_instance.tfe.*.public_ip, count.index), element(aws_instance.tfe.*.private_ip, count.index))
-    type        = "ssh"
-    user        = var.instance_username
-    private_key = var.private_key
-  }
-
-  triggers = {
-    always_run = timestamp()
+  vars = {
+    tfe_admin_password   = var.tfe_admin_password
+    tfe_hostname         = local.tfe_hostname
+    tfe_release_sequence = var.tfe_release_sequence
+    enc_password         = var.tfe_enc_password
+    database_name        = module.rds.database_name
+    database_endpoint    = module.rds.endpoint
+    database_password    = module.rds.database_password
+    database_username    = var.tfe_database_username
+    redis_host           = module.redis.redis_host
+    redis_port           = module.redis.redis_port
+    redis_pass           = module.redis.redis_pass
+    s3_bucket            = module.s3.bucket_id
+    s3_region            = module.s3.region
   }
 }

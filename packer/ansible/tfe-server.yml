@@ -4,29 +4,12 @@
   serial: 1
   become: true
 
-  vars:
-    NODE_NAME: "tfe-Server"
-    PRIVATE_ADDR: "127.0.0.1"
-    PUBLIC_ADDR: "127.0.0.1"
-    HOSTNAME: "server.company.com"
-    RELEASE_SEQUENCE: 0
-    ADMIN_PASSWORD: "admin"
-    ENC_PASSWORD: "admin"
-    DATABASE_NAME: "mydatabase"
-    DATABASE_ENDPOINT: "db.company.com"
-    DATABASE_PASSWORD: "admin"
-    DATABASE_USERNAME: "admin"
-    REDIS_HOST: "redis.company.com"
-    REDIS_PORT: "6379"
-    REDIS_PASS: "admin"
-    S3_BUCKET: "mybucket"
-    S3_REGION: "eu-central-1"
-
   tasks:
 
   - name: install epel-release
     yum:
       name: epel-release
+      update_cache: true
       state: present
 
   - name: install common packages
@@ -35,6 +18,7 @@
         - unzip
         - vim
         - jq
+        - curl
       state: present
 
   - name: disable selinux
@@ -83,31 +67,6 @@
       path: /opt/tfe-installer/
       state: directory
 
-  - name: check if replicated is installed
-    stat: 
-      path: /etc/systemd/system/replicated.service
-    register: replicated_service
-
-  - name: configure replicated
-    template:
-      src: ./files/replicated.conf.j2
-      dest: /etc/replicated.conf
-      mode: 0755
-      owner: root
-      group: root
-    notify:
-      - restart replicated
-
-  - name: configure tfe
-    template:
-      src: ./files/settings.conf.j2
-      dest: /opt/tfe-installer/settings.conf
-      mode: 0755
-      owner: root
-      group: root
-    notify:
-      - restart replicated
-
   - name: set license file
     copy:
       src: ./files/license.rli
@@ -115,8 +74,11 @@
       mode: 0755
       owner: root
       group: root
-    notify:
-      - restart replicated
+
+  - name: check if replicated is installed
+    stat: 
+      path: /etc/systemd/system/replicated.service
+    register: replicated_service
 
   - name: download install file
     unarchive:
@@ -127,19 +89,3 @@
       owner: root
       group: root
     when: replicated_service.stat.exists == false
-
-  - name: start replicated installer
-    shell: 
-      cmd: "./install.sh disable-replicated-ui no-proxy private-address={{ PRIVATE_ADDR }} public-address={{ PUBLIC_ADDR }}"
-      chdir: /opt/tfe-installer/
-    when: replicated_service.stat.exists == false
-
-  handlers:
-
-  - name: restart replicated
-    systemd:
-      name: replicated.service
-      state: restarted
-      enabled: yes
-      daemon_reload: yes
-    when: replicated_service.stat.exists == true

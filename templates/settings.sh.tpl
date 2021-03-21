@@ -1,3 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "INFO: Generating /opt/tfe-installer/settings.conf file."
+mkdir -p /opt/tfe-installer/
+cat <<EOF > /opt/tfe-installer/settings.conf
 {
     "aws_access_key_id": {},
     "aws_instance_profile": {
@@ -26,7 +32,7 @@
         "value": "1"
     },
     "enc_password": {
-        "value": "{{ ENC_PASSWORD }}"
+        "value": "${enc_password}"
     },
     "extern_vault_addr": {},
     "extern_vault_enable": {
@@ -44,7 +50,7 @@
     },
     "gcs_project": {},
     "hostname": {
-        "value": "{{ HOSTNAME }}"
+        "value": "${tfe_hostname}"
     },
     "iact_subnet_list": {},
     "iact_subnet_time_limit": {
@@ -54,19 +60,19 @@
         "value": "production"
     },
     "pg_dbname": {
-        "value": "{{ DATABASE_NAME }}"
+        "value": "${database_name}"
     },
     "pg_extra_params": {
         "value": "sslmode=disable"
     },
     "pg_netloc": {
-        "value": "{{ DATABASE_ENDPOINT }}"
+        "value": "${database_endpoint}"
     },
     "pg_password": {
-        "value": "{{ DATABASE_PASSWORD }}"
+        "value": "${database_password}"
     },
     "pg_user": {
-        "value": "{{ DATABASE_USERNAME }}"
+        "value": "${database_username}"
     },
     "placement": {
         "value": "placement_s3"
@@ -75,26 +81,26 @@
         "value": "external"
     },
     "redis_host" : {
-        "value": "{{ REDIS_HOST }}"
+        "value": "${redis_host}"
     },
     "redis_port" : {
-        "value": "{{ REDIS_PORT }}"
+        "value": "${redis_port}"
     },
     "redis_use_password_auth" : {
         "value": "1"
     },
     "redis_pass" : {
-        "value": "{{ REDIS_PASS }}"
+        "value": "${redis_pass}"
     },
     "redis_use_tls" : {
         "value": "1"
     },
     "s3_bucket": {
-        "value": "{{ S3_BUCKET }}"
+        "value": "${s3_bucket}"
     },
     "s3_endpoint": {},
     "s3_region": {
-        "value": "{{ S3_REGION }}"
+        "value": "${s3_region}"
     },
     "s3_sse": {},
     "s3_sse_kms_key_id": {},
@@ -105,7 +111,7 @@
         "value": "tls_1_2_tls_1_3"
     },
    "install_id":{
-      "value":"{{ HOSTNAME }}"
+      "value":"${tfe_hostname}"
    },   
    "root_secret":{
       "value":"c459ff2cd1346ef4c6da4b950ac59423"
@@ -129,3 +135,4 @@
       "value":"6c1c4d73cc0a6cccbbb61284b0c32b35"
    }
 }
+EOF

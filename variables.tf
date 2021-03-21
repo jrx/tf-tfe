@@ -15,11 +15,6 @@ variable "key_name" {
   description = "Specify the AWS ssh key to use."
 }
 
-variable "private_key" {
-  type        = string
-  description = "SSH private key to provision the cluster instances."
-}
-
 variable "aws_region" {
   type    = string
   default = "eu-north-1"
@@ -34,9 +29,7 @@ variable "aws_azs" {
 variable "amis" {
   type = map(string)
   default = {
-    #eu-central-1 = "ami-04cf43aca3e6f3de3" # centos 7
-    eu-north-1 = "ami-026f0eb2e8006617d" # centos 7
-    #eu-central-1 = "ami-0b418580298265d5c" # ubuntu 18.04
+    eu-north-1 = "ami-02dae9b8dca8dafb7" # centos 7.9
   }
 }
 
