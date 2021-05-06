@@ -32,6 +32,7 @@ output "redis_port" {
 
 output "redis_pass" {
   value = module.redis.redis_pass
+  sensitive = true
 }
 
 output "s3_bucket" {

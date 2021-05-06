@@ -3,22 +3,26 @@ provider "aws" {
 }
 
 module "net" {
-  source       = "./modules/net"
+  source  = "app.terraform.io/jrx/net/aws"
+  version = "0.0.1"
   cluster_name = var.cluster_name
   owner        = var.owner
   aws_azs      = var.aws_azs
 }
 
 module "rds" {
-  source                 = "./modules/rds"
+  source  = "app.terraform.io/jrx/rds/aws"
+  version = "0.0.1"
   cluster_name           = var.cluster_name
   tfe_database_name      = var.tfe_database_name
   tfe_database_username  = var.tfe_database_username
   subnet_ids             = module.net.public_subnets
   vpc_security_group_ids = module.net.vpc_security_group_db
 }
+
 module "redis" {
-  source                 = "./modules/redis"
+  source  = "app.terraform.io/jrx/redis/aws"
+  version = "0.0.1"
   availability_zones     = var.aws_azs
   cluster_name           = var.cluster_name
   subnet_ids             = module.net.public_subnets
@@ -26,7 +30,8 @@ module "redis" {
 }
 
 module "s3" {
-  source       = "./modules/s3"
+  source  = "app.terraform.io/jrx/s3/aws"
+  version = "0.0.1"
   cluster_name = var.cluster_name
 }
 
@@ -35,7 +40,8 @@ locals {
 }
 
 module "route53" {
-  source         = "./modules/route53"
+  source  = "app.terraform.io/jrx/route53/aws"
+  version = "0.0.1"
   domain         = var.domain
   cert_domain    = var.cert_domain
   update_route53 = var.update_route53
